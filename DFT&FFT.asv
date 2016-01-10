@@ -1,0 +1,135 @@
+fs = 500;
+T = 1/fs;
+N = 250; % desired length of signal
+t = [0:N-1]*T; %time vector 
+f1 = 8; f2=f1*2; 
+%x = sin(2*pi*f1*t-pi/2) + sin(2*pi*f2*t);
+x = sin(2*pi*f2*t);
+%adding noise
+x = x+ 0.5 * rand(1, length(x));
+subplot(3,3,1)
+plot(t,x)
+
+%adding noise on both positive and negative side
+x = x+ 0.5 * 2*(rand(1,length(x))-.5);
+subplot(3,3,2)
+plot(t,x)
+ylabel('Amplitude')
+xlabel('Time (seconds)')
+title('Noisy signal');
+
+%can you five 1024 in fft function
+%no only allows how many samples you used in input
+%so here in input N=250 and fft function will also give 250 bins
+xfft = abs(fft(x));
+subplot(3,3,3)
+plot(xfft)
+title('Magnitude spectrum of the signal');
+ylabel('Magnitude')
+xlabel('DFT bins not hertz say bins')
+
+%can you directly see the frequency of signal from plot 
+% No because x axis is not in hertz but in bins
+%to convert (frq(bins)) to freq(herts)
+% your plot shows that there are 250 sample
+% fs = 500 Hz
+% the middle sample i.e. 125 (it represents fs/2)on plot represents 250 Hz
+% similarly 62.5 represents 125 Hz and so on
+%peek we see at betwwen 8 and 9 so roughly 16 Hz
+%magnitude is around 127 which is roughly magOfSin* length(250)/2
+% so to get magnitude abs(frquency bin)/length(signal)*2
+
+%lets make x axis normalized
+%just divide by length of FFT
+subplot(3,3,4)
+plot([0:1/(length(xfft)-1):1],xfft)
+ylabel('Magnitude')
+xlabel('Normalized DFT bins')
+
+subplot(3,3,5)
+freq_plot(x)
+
+%we added noise lets see later how to remove it
+%first lets see how to use windowing etc
+%what happen if number of cycles are not interger multiple
+%circular property of DFT no more holds TODO study it.
+fs =1000
+t=0:1/fs:1-1/fs;
+f1 = 2;
+x1 = 0.5*cos(2*pi*f1*t);
+subplot(2,2,1)
+plot(x1)
+xlabel('samples');
+ylabel('amplitude');
+
+X1=fft(x1);
+subplot(2,2,2)
+plot(abs(X1))
+xlabel('bins');
+ylabel('magnitude');
+
+% upper case if you see plot sinusoid exactly 2 cycles
+%and freq is perfect two peaks of 250
+%lets add half cycle
+f1 = 2.5;
+x1 = 0.5*cos(2*pi*f1*t);
+x1=x1.*hanning(length(x1))'; %hanning gives column convert to row, to
+%remove side lobes
+x1 = [x1 zeros(1,11000)] 
+subplot(2,2,1)
+plot(x1)
+xlabel('samples');
+ylabel('amplitude');
+
+X1=fft(x1);
+subplot(2,2,2)
+plot(abs(X1))
+xlabel('bins');
+ylabel('magnitude');
+%now 2.5 cycles peak is not perfect even see magnitude it is incorrect it
+%is reduced a bit or to say there is spread of spectral energy, energy on
+%multiple bins (why energy ibetween 2 and 3 ? asthis sinu lies between sin
+%with 3 cycles and sin with 2 cycles )
+
+%pad it take random but large number of zeros (if you dont know exact
+%frequency resolution) %enable line 77
+
+%magnitude has corrected itself it is 250 again...
+%zoom it (with zeros added you will) there are side lobes
+%  now use hanning window to reduce side lobs (line 76)
+%hanning
+figure;
+x1 = 0.5*cos(2*pi*f1*t);
+
+hanwin = hanning(1000);%same length of signal
+%green(original) * blue(hanning) = result (red)
+plot(hanwin,'-b')
+hold on
+plot(x1,'g')
+hold on
+x1=x1.*hanning(length(x1))'; %hanning gives column convert to row
+plot(x1,'r')
+
+% enable 76 and 77 you will see sidelobes reduced
+% but magnitude becomes 125 which was corrected by zero padding
+% when ever use hanning window do following
+% to get amplitude when in hanning window general rule
+%at bin 30 (31) amplitude is 125
+% 1000 is length
+ampl = abs(X1(31))/(1000/4); % 0.5 which is correct
+ang = angle(X1(31)) %add 0.2 in phase and you will get it
+
+
+%in this example frequency = bin number
+%to get original frequency
+freq = 30 * 1000/12000;%divide by total bins  2.5
+
+
+
+
+
+%% WHAT IF TWO SINUSOIDS
+% YOU WILL GET TWO BELL SHAPES
+%%
+
+
