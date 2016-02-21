@@ -1,21 +1,5 @@
 %Pitch tracking
-%% Using Autocorrelation to track the local period of a signal
-% This code is used as part of a youtube video demonstration 
-% See http://youtube.com/ddorran
-%
-% Code available at https://dadorran.wordpress.com       
-%
-% The following wav file can be downloaded from 
-%       https://www.dropbox.com/s/3y25abf1xuqpizj/speech_demo.wav
-%% speech analysis example
- 
-% downloading from internet
-% fullURL = ['https://www.dropbox.com/s/3y25abf1xuqpizj' ...
-%            '?term=urlwrite'];
-% filename = 'speech_demo.wav';
-% urlwrite(fullURL,filename);
-% 
-% %web(filename);
+
 [ip fs] = audioread('speech_demo.wav');
 max_expected_period = round(1/50*fs);
 min_expected_period = round(1/200*fs);
